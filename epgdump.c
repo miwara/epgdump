@@ -222,70 +222,6 @@ void	dumpChannel(FILE *outfile)
 		svtcur = svtcur->next;
 	}
 }
-void	dumpCSV(FILE *outfile)
-{
-	SVT_CONTROL	*svtcur ;
-	EIT_CONTROL	*eitcur ;
-    int i;
-
-	svtcur=svttop->next;
-	while(svtcur != NULL) {
-		if (!svtcur->haveeitschedule) {
-			svtcur = svtcur->next;
-			continue;
-		}
-		eitcur = svtcur->eit;
-		while(eitcur != NULL){
-			if(!eitcur->servid){
-				eitcur = eitcur->next ;
-				continue ;
-			}
-			fprintf(outfile,"%s,0x%x,0x%x,%d,%d,",svtcur->servicename,svtcur->original_network_id,svtcur->transport_stream_id,svtcur->event_id,svtcur->frequency);
-			fprintf(outfile,"0x%x,0x%x,%s,%s,%s,%d,\"%s\",\"%s\",",
-					eitcur->event_id,
-					eitcur->content[0],
-					ContentCatList[(eitcur->content[0] >> 4)].japanese,
-					ContentMiddleCatList[eitcur->content[0]].japanese,
-					strTime(eitcur->start_time,"%Y/%m/%d %H:%M:%S"),
-					eitcur->duration,
-					eitcur->title,
-					eitcur->subtitle);
-            if (eitcur->eitextcnt>0) {
-                fprintf(outfile,"\"");
-                for(i=0;i<eitcur->eitextcnt;i++) {
-                    if (eitcur->eitextdesc[i].item_description)
-			            fprintf(outfile, "%s\n",eitcur->eitextdesc[i].item_description);
-                    if (eitcur->eitextdesc[i].item)
-			            fprintf(outfile, "%s\n", eitcur->eitextdesc[i].item);
-                }
-                fprintf(outfile,"\",");
-            }
-            else {
-                fprintf(outfile,",");
-            }
-			fprintf(outfile,"0x%x,%s,",
-					(unsigned char)eitcur->video,
-					getVideoComponentDescStr((unsigned char)eitcur->video));
-            for(i=0;i<2;i++) {
-                if (eitcur->audiodesc[i].audiotype > 0) {
-			    fprintf(outfile,"0x%x-%s-%s-%s,",
-                        eitcur->audiodesc[i].audiotype,
-                        getAudioComponentDescStr(eitcur->audiodesc[i].audiotype),
-                        eitcur->audiodesc[i].langcode,
-                        eitcur->audiodesc[i].audiodesc?eitcur->audiodesc[i].audiodesc:"");
-                }
-                else {
-			fprintf(outfile,",");
-                }
-            }
-			fprintf(outfile,"%s\n",eitcur->freeCA?"有料":"");
-			eitcur=eitcur->next;
-		}
-		svtcur=svtcur->next;
-	}
-	return ;
-}
-
 
 void dumpJSON(FILE *outfile)
 {
@@ -469,11 +405,9 @@ int main(int argc, char *argv[])
 		}
 	}else{
 		fprintf(stdout, "Usage : %s <tsFile> <outfile>\n", argv[0]);
-		fprintf(stdout, "Usage : %s csv  <tsFile> <outfile>\n", argv[0]);
 		fprintf(stdout, "Usage : %s json <tsFile> <outfile>\n", argv[0]);
 		fprintf(stdout, "Usage : %s check <device> <sid> <eventid> <eventtime>\n", argv[0]);
 		fprintf(stdout, "Usage : %s wait <device> <sid> <eventid> <maxwaitsec>\n", argv[0]);
-		fprintf(stdout, "  csv        csv  output mode\n");
 		fprintf(stdout, "  json       json output mode\n");
 		fprintf(stdout, "  check      check event\n");
 		fprintf(stdout, "  wait       wait  event\n");
@@ -485,13 +419,12 @@ int main(int argc, char *argv[])
 
 	ret = GetSDTEITInfo(infile, secs, SECCOUNT);
 
-	if(strcmp(argv[1], "csv") == 0){
-		dumpCSV(outfile);
+	if (strcmp(argv[1], "json") == 0){
+		dumpJSON(outfile);
 	}else if (strcmp(argv[1], "csvc") == 0){
 		dumpChannel(outfile);
-	}else if (strcmp(argv[1], "json") == 0){
-		dumpJSON(outfile);
 	}
+
 	if(inclose) fclose(infile);
 	if(outclose) fclose(outfile);
 
