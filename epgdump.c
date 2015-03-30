@@ -192,6 +192,11 @@ printf("tdt %s\n",strTime(chk.tdttime,"%Y/%m/%d %H:%M:%S"));
 	}
 	return 0;
 }
+
+/*
+ * csvcを指定したときのみ呼ばれる
+ * チャンネル一覧をcsvで出力する
+*/
 void	dumpChannel(FILE *outfile)
 {
 	SVT_CONTROL	*svtcur ;
@@ -223,6 +228,10 @@ void	dumpChannel(FILE *outfile)
 	}
 }
 
+/*
+ * jsonを指定したときのみ呼ばれる
+ * json形式で出力する
+*/
 void dumpJSON(FILE *outfile)
 {
 	SVT_CONTROL	*svtcur ;
