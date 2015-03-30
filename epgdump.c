@@ -369,25 +369,26 @@ int main(int argc, char *argv[])
 	secs[6].pid = 0x13; /* RST */
 	secs[7].pid = 0x24; /* BIT */
 
-    file = NULL;
-    fileout= NULL;
+	file = NULL;
+	fileout= NULL;
+
 	if (argc > 2) {
-    if (argc == 3) {
-        file = argv[1];
-        fileout = argv[2];
-    }
-    else {
-        file = argv[2];
-        fileout = argv[3];
-   }
-		if(strcmp(file, "-")) {
-			infile = fopen(file, "r");
-			inclose = 1;
-		}
-	if(infile == NULL){
-		fprintf(stderr, "Can't open file: %s\n", file);
-		return 1;
-	}
+	  if (argc == 3) {
+	    file = argv[1];
+	    fileout = argv[2];
+	  }
+	  else {
+	    file = argv[2];
+	    fileout = argv[3];
+	  }
+	  if(strcmp(file, "-")) {
+	    infile = fopen(file, "r");
+	    inclose = 1;
+	  }
+	  if(infile == NULL){
+	    fprintf(stderr, "Can't open file: %s\n", file);
+	    return 1;
+	  }
 	}
 
 	if(argc == 6 && ((strcmp(argv[1], "check") == 0)||(strcmp(argv[1],"wait"))==0)){
