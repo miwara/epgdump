@@ -61,15 +61,6 @@ int cnt,extcnt,rest;
 		svtcur = svtcur->next;
 	}
 }
-void	xmlspecialchars(char *str)
-{
-	strrep(str, "&", "&amp;");
-	strrep(str, "'", "&apos;");
-	strrep(str, "\"", "&quot;");
-	strrep(str, "<", "&lt;");
-	strrep(str, ">", "&gt;");
-}
-
 
 int     CheckEIT(FILE *infile,SECcache *secs,int count,EITCHECK *echk)
 {
