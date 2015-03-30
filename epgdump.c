@@ -294,134 +294,7 @@ void	dumpCSV(FILE *outfile)
 	}
 	return ;
 }
-void	dumpXML(FILE *outfile)
-{
-	SVT_CONTROL	*svtcur ;
-	EIT_CONTROL	*eitcur ;
-	time_t	l_time ;
-	time_t	end_time ;
-	struct	tm	tl ;
-	struct	tm	*endtl ;
-	char	cendtime[32];
-	char	cstarttime[32];
-	int	i;
 
-
-	fprintf(outfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-	fprintf(outfile, "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">\n\n");
-	fprintf(outfile, "<tv generator-info-name=\"tsEPG2xml\" generator-info-url=\"http://localhost/\">\n");
-
-	svtcur=svttop->next;
-	while(svtcur != NULL) {
-		if (!svtcur->haveeitschedule) {
-			svtcur = svtcur->next;
-			continue;
-		}
-		memset(ServiceName, '\0', sizeof(ServiceName));
-		strcpy(ServiceName, svtcur->servicename);
-		xmlspecialchars(ServiceName);
-
-		fprintf(outfile, "  <channel id=\"%s_%d\" transport_stream_id=\"%d\" original_network_id=\"%d\" service_id=\"%d\">\n",getBSCSGR(svtcur), svtcur->event_id,svtcur->transport_stream_id,svtcur->original_network_id,svtcur->event_id);
-		fprintf(outfile, "    <display-name lang=\"ja_JP\">%s</display-name>\n", ServiceName);
-		if (svtcur->original_network_id < 0x0010) {
-			fprintf(outfile, "    <satelliteinfo>\n");
-            if (svtcur->frequency > 0) {
-			    fprintf(outfile, "       <frequency>%d</frequency>\n",svtcur->frequency);
-            }
-			fprintf(outfile, "       <TP>%s%d</TP>\n",getTSID2BSCS(svtcur->transport_stream_id),getTSID2TP(svtcur->transport_stream_id));
-			fprintf(outfile, "       <SLOT>%d</SLOT>\n",getTSID2SLOT(svtcur->transport_stream_id));
-			fprintf(outfile, "    </satelliteinfo>\n");
-		}
-		fprintf(outfile, "  </channel>\n");
-		svtcur=svtcur->next;
-	}
-	svtcur=svttop->next;
-	while(svtcur != NULL) {
-		if (!svtcur->haveeitschedule) {
-			svtcur = svtcur->next;
-			continue;
-		}
-		eitcur = svtcur->eit;
-		while(eitcur != NULL){
-			if(!eitcur->servid){
-				eitcur = eitcur->next ;
-				continue ;
-			}
-			memset(title, '\0', sizeof(title));
-			if (eitcur->title) strcpy(title, eitcur->title);
-			xmlspecialchars(title);
-
-			memset(subtitle, '\0', sizeof(subtitle));
-			if (eitcur->subtitle) strcpy(subtitle, eitcur->subtitle);
-			xmlspecialchars(subtitle);
-
-			memset(cendtime, '\0', sizeof(cendtime));
-			memset(cstarttime, '\0', sizeof(cstarttime));
-			strcpy(cendtime, strTime(eitcur->start_time + eitcur->duration , "%Y%m%d%H%M%S"));
-			strcpy(cstarttime, strTime(eitcur->start_time, "%Y%m%d%H%M%S"));
-			
-			fprintf(outfile, "  <programme start=\"%s +0900\" stop=\"%s +0900\" channel=\"%s_%d\" ",
-				cstarttime, cendtime, getBSCSGR(svtcur),svtcur->event_id);
-			fprintf(outfile, "event_id=\"%d\" duration=\"%d\">\n",
-				eitcur->event_id,eitcur->duration);
-
-			fprintf(outfile, "    <title lang=\"ja_JP\">%s</title>\n", title);
-			
-			fprintf(outfile, "    <desc lang=\"ja_JP\">%s</desc>\n", subtitle);
-
-			for(i=0;i<eitcur->numcontent;i++) {
-			fprintf(outfile, "    <category lang=\"ja_JP\">%s</category>\n",getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_LARGE,CONTENT_LANG_JA) );
-			
-			fprintf(outfile, "    <category lang=\"en\">%s</category>\n", getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_LARGE,CONTENT_LANG_EN));
-
-			fprintf(outfile, "    <category_middle lang=\"ja_JP\">%s</category_middle>\n",getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_MIDDLE,CONTENT_LANG_JA));
-			fprintf(outfile, "    <category_middle lang=\"en\">%s</category_middle>\n",getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_MIDDLE,CONTENT_LANG_EN));
-			}
-			for(i=0;i<eitcur->numattachinfo;i++) {
-				fprintf(outfile, "    <attachinfo>%s</attachinfo>\n",getAttachInfo(eitcur->attachinfo[i]));
-			}
-			fprintf(outfile, "    <freeCA>%d</freeCA>\n",eitcur->freeCA);
-
-			fprintf(outfile, "    <video id=\"%d\">\n",(unsigned char)eitcur->video);
-			fprintf(outfile, "       <resolution>%s</resolution>\n",getVideoResolution(eitcur->video));
-			fprintf(outfile, "       <aspect>%s</aspect>\n",getVideoAspect(eitcur->video));
-			fprintf(outfile, "    </video>\n");
-			for(i=0;i<2;i++) {
-				if (eitcur->audiodesc[i].audiotype > 0) {
-					fprintf(outfile, "    <audio id=\"%d\">\n",(unsigned char)eitcur->audiodesc[i].audiotype);
-					fprintf(outfile, "       <desc>%s</desc>\n",getAudioComponentDescStr(eitcur->audiodesc[i].audiotype));
-					fprintf(outfile, "       <lang>%s</lang>\n",eitcur->audiodesc[i].langcode);
-					fprintf(outfile, "       <extdesc>%s</extdesc>\n",eitcur->audiodesc[i].audiodesc?eitcur->audiodesc[i].audiodesc:"");
-					fprintf(outfile, "    </audio>\n");
-				}
-			}
-			if (eitcur->eitextcnt>0) {
-				char *p;
-				fprintf(outfile, "    <extdesc>\n");
-				for(i=0;i<eitcur->eitextcnt;i++) {
-					if (eitcur->eitextdesc[i].item_description) {
-						p = realloc(eitcur->eitextdesc[i].item_description,(strlen(eitcur->eitextdesc[i].item_description)*2)+1);
-						xmlspecialchars(p);
-						fprintf(outfile, "     <item_description>%s</item_description>\n",p);
-						free(p);
-					}
-					if (eitcur->eitextdesc[i].item) {
-						p = realloc(eitcur->eitextdesc[i].item,(strlen(eitcur->eitextdesc[i].item)*2)+1);
-						xmlspecialchars(p);
-						fprintf(outfile, "     <item>%s</item>\n",p);
-						free(p);
-					}
-				}
-				fprintf(outfile, "    </extdesc>\n");
-			}
-			
-			fprintf(outfile, "  </programme>\n");
-			eitcur=eitcur->next;
-		}
-		svtcur=svtcur->next;
-	}
-    fprintf(outfile, "</tv>\n");
-}
 
 void dumpJSON(FILE *outfile)
 {
@@ -627,8 +500,6 @@ int main(int argc, char *argv[])
 		dumpChannel(outfile);
 	}else if (strcmp(argv[1], "json") == 0){
 		dumpJSON(outfile);
-	}else{
-		dumpXML(outfile);
 	}
 	if(inclose) fclose(infile);
 	if(outclose) fclose(outfile);
