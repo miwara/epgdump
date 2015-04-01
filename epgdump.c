@@ -405,6 +405,8 @@ int main(int argc, char *argv[])
 	  }
 	}
 
+	// 入力ファイルの処理
+	// tsフォーマットであることを期待
  	file = argv[optind];
 	// 拡張子でしか判断してない．
 	// ファイルの中身がちゃんとtsフォーマットになっているか判断していない
@@ -416,6 +418,10 @@ int main(int argc, char *argv[])
 	  fprintf(stderr, "%s: file does not exist\n", file);
 	  return 1;
 	}
+
+	// 出力ファイルの処理
+	// ハイフン"-"にすると標準出力する
+ 	fileout= argv[optind+1];
 	if(strcmp(fileout, "-")) {
 	  outfile = fopen(fileout, "w+");
 	}
