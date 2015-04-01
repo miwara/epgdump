@@ -411,7 +411,10 @@ int main(int argc, char *argv[])
  	file = argv[optind];
  	fileout= argv[optind+1];
 	if(strcmp(file, "-")) {
-	  infile = fopen(file, "r");
+	  if((infile = fopen(file, "r")) == NULL) {
+	    fprintf(stderr, "%s: file does not exist\n", file);
+	    return 1;
+	  }
 	  inclose = 1;
 	}
 	if(strcmp(fileout, "-")) {
