@@ -409,7 +409,7 @@ int main(int argc, char *argv[])
 	}
 
  	file = argv[optind];
- 	fileout= argv[optind+1];;
+ 	fileout= argv[optind+1];
 	if(strcmp(file, "-")) {
 	  infile = fopen(file, "r");
 	  inclose = 1;
