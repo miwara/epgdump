@@ -365,7 +365,7 @@ void usage_exit()
 
 int main(int argc, char *argv[])
 {
-	FILE *infile = stdin;
+	FILE *infile;
 	FILE *outfile = stdout;
 	char *file,*fileout;
 	int   inclose = 0;
@@ -408,13 +408,11 @@ int main(int argc, char *argv[])
 
  	file = argv[optind];
  	fileout= argv[optind+1];
-	if(strcmp(file, "-")) {
-	  if((infile = fopen(file, "r")) == NULL) {
-	    fprintf(stderr, "%s: file does not exist\n", file);
-	    return 1;
-	  }
-	  inclose = 1;
+	if((infile = fopen(file, "r")) == NULL) {
+	  fprintf(stderr, "%s: file does not exist\n", file);
+	  return 1;
 	}
+	inclose = 1;
 	if(strcmp(fileout, "-")) {
 	  outfile = fopen(fileout, "w+");
 	  outclose = 1;
