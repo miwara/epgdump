@@ -385,8 +385,6 @@ int main(int argc, char *argv[])
 	secs[6].pid = 0x13; /* RST */
 	secs[7].pid = 0x24; /* BIT */
 
-// ここから引数を処理している．綺麗にしたい
-
 	if(argc < 3){
 	  usage_exit();
 	}
@@ -442,8 +440,6 @@ int main(int argc, char *argv[])
 		return ret;
 	}
 */
-
-// ここまで引数を処理
 
 	svttop = calloc(1, sizeof(SVT_CONTROL));
 
