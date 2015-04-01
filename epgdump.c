@@ -402,6 +402,8 @@ int main(int argc, char *argv[])
 	  }
 	}
 
+/* 使わないので一旦コメントアウト
+ * 別のプログラムに分割した方がいい
 	if(argc == 6 && ((strcmp(argv[1], "check") == 0)||(strcmp(argv[1],"wait"))==0)){
 		memset(&chk,0,sizeof(EITCHECK));
 		chk.svid = atoi(argv[3]);
@@ -418,6 +420,7 @@ int main(int argc, char *argv[])
 		// 0..ok 1..fail
 		return ret;
 	}
+*/
 
 	if(argc >= 3){
 		if(strcmp(fileout, "-")) {
@@ -427,11 +430,11 @@ int main(int argc, char *argv[])
 	}else{
 		fprintf(stdout, "Usage : %s <tsFile> <outfile>\n", argv[0]);
 		fprintf(stdout, "Usage : %s json <tsFile> <outfile>\n", argv[0]);
-		fprintf(stdout, "Usage : %s check <device> <sid> <eventid> <eventtime>\n", argv[0]);
-		fprintf(stdout, "Usage : %s wait <device> <sid> <eventid> <maxwaitsec>\n", argv[0]);
+// 		fprintf(stdout, "Usage : %s check <device> <sid> <eventid> <eventtime>\n", argv[0]);
+// 		fprintf(stdout, "Usage : %s wait <device> <sid> <eventid> <maxwaitsec>\n", argv[0]);
 		fprintf(stdout, "  json       json output mode\n");
-		fprintf(stdout, "  check      check event\n");
-		fprintf(stdout, "  wait       wait  event\n");
+// 		fprintf(stdout, "  check      check event\n");
+// 		fprintf(stdout, "  wait       wait  event\n");
 		fprintf(stdout, "VERSION : %s\n",VERSION);
 		return 0;
 	}
