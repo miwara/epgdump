@@ -30,6 +30,10 @@ char	ServiceName[1024];
 
 static	EITCHECK	chk;
 
+
+/*
+ * デバック用
+*/
 void signalhandler()
 {
 SVT_CONTROL *svtcur;
@@ -62,6 +66,12 @@ int cnt,extcnt,rest;
 	}
 }
 
+
+/*
+ * 引数で"check"と"wait"を指定したときのみ呼ばれる
+ * 具体的な部分は分からない(readmeも意味不明)
+ *
+*/
 int     CheckEIT(FILE *infile,SECcache *secs,int count,EITCHECK *echk)
 {
 	SVT_CONTROL	*svtcur ;
@@ -369,6 +379,7 @@ int main(int argc, char *argv[])
 	secs[6].pid = 0x13; /* RST */
 	secs[7].pid = 0x24; /* BIT */
 
+// ここから引数を処理している．綺麗にしたい
 	file = NULL;
 	fileout= NULL;
 
@@ -382,7 +393,7 @@ int main(int argc, char *argv[])
 	    fileout = argv[3];
 	  }
 	  if(strcmp(file, "-")) {
-	    infile = fopen(file, "r");
+	    infile = fopen(file, "r"); // 標準入力をオープン
 	    inclose = 1;
 	  }
 	  if(infile == NULL){
@@ -410,7 +421,7 @@ int main(int argc, char *argv[])
 
 	if(argc >= 3){
 		if(strcmp(fileout, "-")) {
-			outfile = fopen(fileout, "w+");
+			outfile = fopen(fileout, "w+"); // 標準出力をオープン
 			outclose = 1;
 		}
 	}else{
@@ -424,6 +435,7 @@ int main(int argc, char *argv[])
 		fprintf(stdout, "VERSION : %s\n",VERSION);
 		return 0;
 	}
+// ここまで引数を処理
 
 	svttop = calloc(1, sizeof(SVT_CONTROL));
 
