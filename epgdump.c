@@ -402,6 +402,7 @@ int main(int argc, char *argv[])
 	    break;
 
 	  default:
+	    usage_exit();
 	    break;
 	  }
 	}
