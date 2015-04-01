@@ -406,7 +406,12 @@ int main(int argc, char *argv[])
 	}
 
  	file = argv[optind];
- 	fileout= argv[optind+1];
+	// 拡張子でしか判断してない．
+	// ファイルの中身がちゃんとtsフォーマットになっているか判断していない
+	if(strstr(file, ".ts") == NULL) {
+	  fprintf(stderr, "%s: file is not Transport Stream format\n", file);
+	  return 1;
+	}
 	if((infile = fopen(file, "r")) == NULL) {
 	  fprintf(stderr, "%s: file does not exist\n", file);
 	  return 1;
