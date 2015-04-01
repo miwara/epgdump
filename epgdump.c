@@ -380,27 +380,31 @@ int main(int argc, char *argv[])
 	secs[7].pid = 0x24; /* BIT */
 
 // ここから引数を処理している．綺麗にしたい
-	file = NULL;
-	fileout= NULL;
 
-	if (argc > 2) {
-	  if (argc == 3) {
-	    file = argv[1];
-	    fileout = argv[2];
-	  }
-	  else {
-	    file = argv[2];
-	    fileout = argv[3];
-	  }
-	  if(strcmp(file, "-")) {
-	    infile = fopen(file, "r"); // 標準入力をオープン
-	    inclose = 1;
-	  }
-	  if(infile == NULL){
-	    fprintf(stderr, "Can't open file: %s\n", file);
-	    return 1;
+	int opt;
+	char *type = "json"; /* デフォルトの出力ファイルフォーマットはjson */
+	while((opt = getopt(argc, argv, "tv")) != -1){
+	  switch (opt){
+	  case 't':
+	    type = "csvc";
+	    break;
+
+	  default:
+	    break;
 	  }
 	}
+
+ 	file = argv[optind];
+ 	fileout= argv[optind+1];;
+	if(strcmp(file, "-")) {
+	  infile = fopen(file, "r");
+	  inclose = 1;
+	}
+	if(strcmp(fileout, "-")) {
+	  outfile = fopen(fileout, "w+");
+	  outclose = 1;
+	}
+
 
 /* 使わないので一旦コメントアウト
  * 別のプログラムに分割した方がいい
@@ -422,7 +426,7 @@ int main(int argc, char *argv[])
 	}
 */
 
-	if(argc >= 3){
+/*	if(argc >= 3){
 		if(strcmp(fileout, "-")) {
 			outfile = fopen(fileout, "w+"); // 標準出力をオープン
 			outclose = 1;
@@ -438,16 +442,18 @@ int main(int argc, char *argv[])
 		fprintf(stdout, "VERSION : %s\n",VERSION);
 		return 0;
 	}
+*/
 // ここまで引数を処理
 
 	svttop = calloc(1, sizeof(SVT_CONTROL));
 
 	ret = GetSDTEITInfo(infile, secs, SECCOUNT);
 
-	if (strcmp(argv[1], "json") == 0){
-		dumpJSON(outfile);
-	}else if (strcmp(argv[1], "csvc") == 0){
+
+	if (strcmp(type, "csvc") == 0){
 		dumpChannel(outfile);
+	} else {
+		dumpJSON(outfile);
 	}
 
 	if(inclose) fclose(infile);
