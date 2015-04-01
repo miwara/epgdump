@@ -356,6 +356,12 @@ void dumpJSON(FILE *outfile)
 	fprintf(outfile,"]");
 }
 
+void usage_exit()
+{
+  fprintf(stdout, "Usage : epgdump [th] <tsFile> <outfile>\n");
+  fprintf(stdout, "-t\t output file format csv\n");
+  exit(0);
+}
 
 int main(int argc, char *argv[])
 {
@@ -381,12 +387,20 @@ int main(int argc, char *argv[])
 
 // ここから引数を処理している．綺麗にしたい
 
+	if(argc < 3){
+	  usage_exit();
+	}
+
 	int opt;
 	char *type = "json"; /* デフォルトの出力ファイルフォーマットはjson */
-	while((opt = getopt(argc, argv, "tv")) != -1){
+	while((opt = getopt(argc, argv, "th")) != -1){
 	  switch (opt){
 	  case 't':
 	    type = "csvc";
+	    break;
+
+	  case 'h':
+	    usage_exit();
 	    break;
 
 	  default:
@@ -426,23 +440,6 @@ int main(int argc, char *argv[])
 	}
 */
 
-/*	if(argc >= 3){
-		if(strcmp(fileout, "-")) {
-			outfile = fopen(fileout, "w+"); // 標準出力をオープン
-			outclose = 1;
-		}
-	}else{
-		fprintf(stdout, "Usage : %s <tsFile> <outfile>\n", argv[0]);
-		fprintf(stdout, "Usage : %s json <tsFile> <outfile>\n", argv[0]);
-// 		fprintf(stdout, "Usage : %s check <device> <sid> <eventid> <eventtime>\n", argv[0]);
-// 		fprintf(stdout, "Usage : %s wait <device> <sid> <eventid> <maxwaitsec>\n", argv[0]);
-		fprintf(stdout, "  json       json output mode\n");
-// 		fprintf(stdout, "  check      check event\n");
-// 		fprintf(stdout, "  wait       wait  event\n");
-		fprintf(stdout, "VERSION : %s\n",VERSION);
-		return 0;
-	}
-*/
 // ここまで引数を処理
 
 	svttop = calloc(1, sizeof(SVT_CONTROL));
