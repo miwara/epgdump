@@ -30,6 +30,10 @@ char	ServiceName[1024];
 
 static	EITCHECK	chk;
 
+
+/*
+ * デバック用
+*/
 void signalhandler()
 {
 SVT_CONTROL *svtcur;
@@ -62,6 +66,12 @@ int cnt,extcnt,rest;
 	}
 }
 
+
+/*
+ * 引数で"check"と"wait"を指定したときのみ呼ばれる
+ * 具体的な部分は分からない(readmeも意味不明)
+ *
+*/
 int     CheckEIT(FILE *infile,SECcache *secs,int count,EITCHECK *echk)
 {
 	SVT_CONTROL	*svtcur ;
@@ -346,14 +356,18 @@ void dumpJSON(FILE *outfile)
 	fprintf(outfile,"]");
 }
 
+void usage_exit()
+{
+  fprintf(stdout, "Usage : epgdump [th] <tsFile> <outfile>\n");
+  fprintf(stdout, "-t\t output file format csv\n");
+  exit(0);
+}
 
 int main(int argc, char *argv[])
 {
-	FILE *infile = stdin;
+	FILE *infile;
 	FILE *outfile = stdout;
 	char *file,*fileout;
-	int   inclose = 0;
-	int   outclose = 0;
 	int	ret;
 	SECcache   secs[SECCOUNT];
 
@@ -369,28 +383,52 @@ int main(int argc, char *argv[])
 	secs[6].pid = 0x13; /* RST */
 	secs[7].pid = 0x24; /* BIT */
 
-	file = NULL;
-	fileout= NULL;
+	if(argc < 3){
+	  usage_exit();
+	}
 
-	if (argc > 2) {
-	  if (argc == 3) {
-	    file = argv[1];
-	    fileout = argv[2];
-	  }
-	  else {
-	    file = argv[2];
-	    fileout = argv[3];
-	  }
-	  if(strcmp(file, "-")) {
-	    infile = fopen(file, "r");
-	    inclose = 1;
-	  }
-	  if(infile == NULL){
-	    fprintf(stderr, "Can't open file: %s\n", file);
-	    return 1;
+	int opt;
+	char *type = "json"; /* デフォルトの出力ファイルフォーマットはjson */
+	while((opt = getopt(argc, argv, "th")) != -1){
+	  switch (opt){
+	  case 't':
+	    type = "csvc";
+	    break;
+
+	  case 'h':
+	    usage_exit();
+	    break;
+
+	  default:
+	    usage_exit();
+	    break;
 	  }
 	}
 
+	// 入力ファイルの処理
+	// tsフォーマットであることを期待
+ 	file = argv[optind];
+	// 拡張子でしか判断してない．
+	// ファイルの中身がちゃんとtsフォーマットになっているか判断していない
+	if(strstr(file, ".ts") == NULL) {
+	  fprintf(stderr, "%s: file is not Transport Stream format\n", file);
+	  return 1;
+	}
+	if((infile = fopen(file, "r")) == NULL) {
+	  fprintf(stderr, "%s: file does not exist\n", file);
+	  return 1;
+	}
+
+	// 出力ファイルの処理
+	// ハイフン"-"にすると標準出力する
+ 	fileout= argv[optind+1];
+	if(strcmp(fileout, "-")) {
+	  outfile = fopen(fileout, "w+");
+	}
+
+
+/* 使わないので一旦コメントアウト
+ * 別のプログラムに分割した方がいい
 	if(argc == 6 && ((strcmp(argv[1], "check") == 0)||(strcmp(argv[1],"wait"))==0)){
 		memset(&chk,0,sizeof(EITCHECK));
 		chk.svid = atoi(argv[3]);
@@ -407,36 +445,21 @@ int main(int argc, char *argv[])
 		// 0..ok 1..fail
 		return ret;
 	}
-
-	if(argc >= 3){
-		if(strcmp(fileout, "-")) {
-			outfile = fopen(fileout, "w+");
-			outclose = 1;
-		}
-	}else{
-		fprintf(stdout, "Usage : %s <tsFile> <outfile>\n", argv[0]);
-		fprintf(stdout, "Usage : %s json <tsFile> <outfile>\n", argv[0]);
-		fprintf(stdout, "Usage : %s check <device> <sid> <eventid> <eventtime>\n", argv[0]);
-		fprintf(stdout, "Usage : %s wait <device> <sid> <eventid> <maxwaitsec>\n", argv[0]);
-		fprintf(stdout, "  json       json output mode\n");
-		fprintf(stdout, "  check      check event\n");
-		fprintf(stdout, "  wait       wait  event\n");
-		fprintf(stdout, "VERSION : %s\n",VERSION);
-		return 0;
-	}
+*/
 
 	svttop = calloc(1, sizeof(SVT_CONTROL));
 
 	ret = GetSDTEITInfo(infile, secs, SECCOUNT);
 
-	if (strcmp(argv[1], "json") == 0){
-		dumpJSON(outfile);
-	}else if (strcmp(argv[1], "csvc") == 0){
+
+	if (strcmp(type, "csvc") == 0){
 		dumpChannel(outfile);
+	} else {
+		dumpJSON(outfile);
 	}
 
-	if(inclose) fclose(infile);
-	if(outclose) fclose(outfile);
+	fclose(infile);
+	fclose(outfile);
 
 	return ret;
 }
