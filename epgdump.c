@@ -1,5 +1,3 @@
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -19,6 +17,7 @@
 
 #include "xmldata.c"
 
+#define VERSION "0.2.2"
 
 SVT_CONTROL	*svttop = NULL;
 #define		SECCOUNT	10
@@ -358,6 +357,7 @@ void dumpJSON(FILE *outfile)
 
 void usage_exit()
 {
+  fprintf(stdout, "version %s\n", VERSION);
   fprintf(stdout, "Usage : epgdump [th] <tsFile> <outfile>\n");
   fprintf(stdout, "-t\t output file format csv\n");
   exit(0);
