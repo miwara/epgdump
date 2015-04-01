@@ -368,8 +368,6 @@ int main(int argc, char *argv[])
 	FILE *infile;
 	FILE *outfile = stdout;
 	char *file,*fileout;
-	int   inclose = 0;
-	int   outclose = 0;
 	int	ret;
 	SECcache   secs[SECCOUNT];
 
@@ -413,10 +411,8 @@ int main(int argc, char *argv[])
 	  fprintf(stderr, "%s: file does not exist\n", file);
 	  return 1;
 	}
-	inclose = 1;
 	if(strcmp(fileout, "-")) {
 	  outfile = fopen(fileout, "w+");
-	  outclose = 1;
 	}
 
 
@@ -451,8 +447,8 @@ int main(int argc, char *argv[])
 		dumpJSON(outfile);
 	}
 
-	if(inclose) fclose(infile);
-	if(outclose) fclose(outfile);
+	fclose(infile);
+	fclose(outfile);
 
 	return ret;
 }
