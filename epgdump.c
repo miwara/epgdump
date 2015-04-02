@@ -311,8 +311,12 @@ void dumpJSON(FILE *outfile)
 			fprintf(outfile,"\"category\":[");
 			for(i=0;i<eitcur->numcontent;i++) {
 				fprintf(outfile,"%s{",eitextcanma);
-				fprintf(outfile,"\"large\": { \"ja_JP\" : \"%s\", \"en\" : \"%s\"},",getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_LARGE,CONTENT_LANG_JA),getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_LARGE,CONTENT_LANG_EN));
-				fprintf(outfile,"\"middle\": { \"ja_JP\" : \"%s\", \"en\" : \"%s\"}}",getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_MIDDLE,CONTENT_LANG_JA),getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_MIDDLE,CONTENT_LANG_EN));
+				fprintf(outfile,"\"large\": { \"ja_JP\" : \"%s\", \"en\" : \"%s\"},",
+					getContentStr(eitcur->content[i], eitcur->usernibble[i], CONTENT_LARGE,CONTENT_LANG_JA),
+					getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_LARGE,CONTENT_LANG_EN));
+				fprintf(outfile,"\"middle\": { \"ja_JP\" : \"%s\", \"en\" : \"%s\"}}",
+					getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_MIDDLE,CONTENT_LANG_JA),
+					getContentStr(eitcur->content[i],eitcur->usernibble[i],CONTENT_MIDDLE,CONTENT_LANG_EN));
 				eitextcanma=",";
 			}
 			fprintf(outfile,"],");
