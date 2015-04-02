@@ -86,7 +86,7 @@ void usage_exit()
   exit(0);
 }
 
-int main(int argc, char argv[])
+int main(int argc, char *argv[])
 {
   FILE *infile;
   SECcache   secs[SECCOUNT];
