@@ -36,10 +36,10 @@
 SVT_CONTROL	*svttop = NULL;
 static	EITCHECK	chk;
 
-int CheckEIT(FILE *infile,SECcache *secs,int count,EITCHECK *echk)
+int CheckEIT(FILE *infile, SECcache *secs, int count, EITCHECK *echk)
 {
-  SVT_CONTROL	*svtcur ;
-  int		pid,ret,sdtflg;
+  SVT_CONTROL	*svtcur;
+  int		pid, ret, sdtflg;
   SECcache      *bsecs;
 
   svttop = calloc(1, sizeof(SVT_CONTROL));
@@ -82,7 +82,7 @@ int CheckEIT(FILE *infile,SECcache *secs,int count,EITCHECK *echk)
 
 void usage_exit()
 {
-  fprintf(stdout, "Usage : ");
+  fprintf(stdout, "Usage : hasnextevent");
   exit(0);
 }
 
@@ -107,13 +107,14 @@ int main(int argc, char *argv[])
     usage_exit();
   }
 
+  infile = fopen(argv[1], "r");
+
   memset(&chk,0,sizeof(EITCHECK));
   chk.svid = atoi(argv[2]);
   chk.evid = atoi(argv[3]);
   chk.starttime = str2timet(argv[4]);
   chk.waitend = time(NULL) + 11;
 
-  infile = fopen(argv[1], "r");
   ret = CheckEIT(infile,secs, SECCOUNT,&chk);
   // 0..success 1..failed
 
