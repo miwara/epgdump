@@ -65,55 +65,6 @@ int cnt,extcnt,rest;
 	}
 }
 
-
-/*
- * 引数で"check"と"wait"を指定したときのみ呼ばれる
- * 具体的な部分は分からない(readmeも意味不明)
- *
-*/
-int     CheckEIT(FILE *infile,SECcache *secs,int count,EITCHECK *echk)
-{
-	SVT_CONTROL	*svtcur ;
-	int 		pid,ret,sdtflg;
-	SECcache  *bsecs;
-
-	svttop = calloc(1, sizeof(SVT_CONTROL));
-	sdtflg = 0;
-
-	while((bsecs = readTS(infile, secs, count)) != NULL) {
-		pid = bsecs->pid & 0xFF;
-		switch (pid) {
-			case 0x11: //SDT
-				if (sdtflg==0) {
-					sdtflg=1;
-					dumpSDT(bsecs->buf, svttop);
-					svtcur = svttop->next;
-					while(svtcur) {
-						if (svtcur->eit == NULL) {
-							svtcur->eit = calloc(1, sizeof(EIT_CONTROL));
-						}
-						svtcur = svtcur->next;
-					}
-				}
-				break;
-			case 0x12: // EIT
-				ret = dumpEIT2(bsecs->buf,svttop,echk);
-				if (ret == EIT_CHECKOK || ret == EIT_CHECKNG) { //CHECK COMPLETE
-					return ret - EIT_CHECKOK;
-				}
-				if (ret == EIT_SDTNOTFOUND) sdtflg=0;
-				break;
-			case 0x14: // TDT
-				dumpTDT(bsecs->buf,echk);
-				break;
-			case 0x13: // RST
-				printf("RST\n");
-				break;
-        }
-	if (echk->waitend < time(NULL)) {return 1;}
-    }
-    return 1; // EOF
-}
 int	GetSDTEITInfo(FILE *infile,SECcache *secs,int count)
 {
 	SVT_CONTROL	*svtcur ;
@@ -425,27 +376,6 @@ int main(int argc, char *argv[])
 	if(strcmp(fileout, "-")) {
 	  outfile = fopen(fileout, "w+");
 	}
-
-
-/* 使わないので一旦コメントアウト
- * 別のプログラムに分割した方がいい
-	if(argc == 6 && ((strcmp(argv[1], "check") == 0)||(strcmp(argv[1],"wait"))==0)){
-		memset(&chk,0,sizeof(EITCHECK));
-		chk.svid = atoi(argv[3]);
-		chk.evid = atoi(argv[4]);
-		if (strcmp(argv[1],"check")==0) {
-			chk.starttime = str2timet(argv[5]);
-			chk.waitend = time(NULL) + 11;
-		}
-		else {
-			chk.waitend = time(NULL) + atoi(argv[5]);
-		}
-		ret = CheckEIT(infile,secs, SECCOUNT,&chk);
-		if (inclose) fclose(infile);
-		// 0..ok 1..fail
-		return ret;
-	}
-*/
 
 	svttop = calloc(1, sizeof(SVT_CONTROL));
 
