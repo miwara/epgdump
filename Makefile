@@ -1,5 +1,5 @@
 PREFIX		= /usr/local
-TARGETS		= epgdump hasnextevent waiteventstart
+TARGETS		= epgdump hasnextevent
 OBJ_TARGETS	= aribstr.o eit.o nit.o sdt.o bit.o ts.o tdt.o util.o
 HEADDERDEPEND	= aribstr.h eit.h nit.h sdt.h bit.h ts.h tdt.h util.h
 
@@ -18,9 +18,6 @@ epgdump: ${OBJ_TARGETS} epgdump.o
 
 hasnextevent: ${OBJ_TARGETS} hasnextevent.o
 	${CC} ${CFLAGS} ${OBJ_TARGETS} hasnextevent.o -o $@ ${LDFLAGS} ${LIBS}
-
-waiteventstart: ${OBJ_TARGETS} waiteventstart.o
-	${CC} ${CFLAGS} ${OBJ_TARGETS} waiteventstart.o -o $@ ${LDFLAGS} ${LIBS}
 
 ${OBJ_TARGETS}: ${HEDDERDEPEND}
 
