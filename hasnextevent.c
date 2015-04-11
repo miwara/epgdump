@@ -11,7 +11,7 @@
  * 次のイベントにある場合０で終了します。
  * 次のイベントにない場合１で終了します。
  * EIT情報が取得できない場合等含めて最長約１０秒で終了します。
- * 第５引数とイベント開始時刻差を秒数で標準出力に出力します。
+ * 第4引数とイベント開始時刻差を秒数で標準出力に出力します。
 */
 
 #include <stdio.h>
@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
   memset(&chk,0,sizeof(EITCHECK));
   chk.svid = atoi(argv[2]);
   chk.evid = atoi(argv[3]);
+
   chk.starttime = str2timet(argv[4]);
   chk.waitend = time(NULL) + 11;
 
